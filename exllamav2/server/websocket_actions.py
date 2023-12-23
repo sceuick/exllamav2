@@ -179,7 +179,12 @@ async def infer(request, ws, server, response):
     gs.token_repetition_penalty = float(request["rep_pen"]) if "rep_pen" in request else 1.05
     gs.token_frequency_penalty = float(request["freq_pen"]) if "freq_pen" in request else 0.0
     gs.token_presence_penalty = float(request["pres_pen"]) if "pres_pen" in request else 0.0
-    gs.disallow_tokens(server.tokenizer, bb)
+    gs.disallow_tokens(server.tokenizer, server.tokenizer.eos_token_id)
+
+    if "logit_bias" in request:
+        for key, value in request["logit_bias"].items():
+            token_id = int(key)
+            gs.token_bias[token_id] = float(value)
 
     # Generate
 
